@@ -11,6 +11,7 @@ db.execute(
 
 function DatabaseComponent() {
   const [result, setResult] = useState<any[] | null>(null);
+  const [unsub, setUnsub] = useState<(() => void) | null>(null);
 
   useEffect(() => {
     console.log("Effect mounted");
@@ -32,9 +33,11 @@ function DatabaseComponent() {
     // NOTE: unsubscribe() works when called here, but not when unmounting.
     // unsubscribe();
 
+    // NOTE: setting unsubcribe to a useState runs it.
+    // setUnsub(unsubscribe);
+
     return () => {
       console.log("Effect unmounting");
-      // NOTE: "Callback ran!" still prints even though we've unsubscribed.
       unsubscribe();
     };
   }, []);
@@ -55,6 +58,14 @@ export default function App() {
       <StatusBar style="auto" />
       <Button
         title={showDatabase ? "Unmount Database" : "Mount Database"}
+        // NOTE: Unmounting the database component does not unsubscribe. "Callback ran!" still prints.
+        // So whenever we mount and run a query, it will keep on making more and more callbacks.
+        // To repro:
+        // 1. Mount DB
+        // 2. Run query
+        // 3. Unmount DB
+        // 4. Mount DB again
+        // 5. Run query
         onPress={() => setShowDatabase(!showDatabase)}
       />
       {showDatabase && <DatabaseComponent />}
