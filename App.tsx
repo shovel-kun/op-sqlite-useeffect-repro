@@ -74,7 +74,7 @@ export default function App() {
         onPress={async () => {
           console.log("Pressed!");
           await db.transaction(async (tx) => {
-            tx.execute("INSERT INTO test (name) VALUES (?)", ["test"]);
+            await tx.execute("INSERT INTO test (name) VALUES (?)", ["test"]);
           });
         }}
       />
